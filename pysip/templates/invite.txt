@@ -1,0 +1,30 @@
+INVITE sip:{{ from['user'] }}@{{ address['ip'] }}:{{ address['port'] }} SIP/2.0
+Via: SIP/2.0/UDP {{ address['ip'] }}:{{ address['port'] }};rport;branch={{ branch }}
+Max-Forwards: 100
+From: <sip:{{ from['user'] }}@{{ address['ip'] }}>;tag={{ from['tag'] }}
+To: <sip:{{ from['user'] }}@{{ from['domain'] }}>
+Call-ID: {{ callid }}
+Alg-test: 0
+CSeq: 1 INVITE
+Contact: <sip:{{ from['user'] }}@{{ address['ip'] }}:{{ address['port'] }}>
+User-Agent: PySIP
+Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY, PUBLISH, SUBSCRIBE
+Supported: path, replaces
+Allow-Events: talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer
+Content-Type: application/sdp
+Content-Disposition: session
+Content-Length: 281
+
+v=0
+o=SIPPulse 1546586511 1546586512 IN IP4 {{ address['ip'] }}
+s=SIPPulse
+c=IN IP4 {{ address['ip'] }}
+t=0 0
+m=audio 17828 RTP/AVP 18 0 8 101
+a=rtpmap:18 G729/8000
+a=fmtp:18 annexb=no
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-16
+a=ptime:20
