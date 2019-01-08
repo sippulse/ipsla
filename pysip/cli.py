@@ -1,13 +1,16 @@
-import click
 import socket
 import logging
 from time import time
 from random import random
-from pprint import pprint
+from functools import reduce
+
+import click
+from pynat import get_ip_info
 
 from pysip.log import logger
 from pysip.messages import Message, parse_header
-
+from pysip.utils import send_loop, average, minimal, maximum
+from pysip.socketserver import RTPProxyEmulator, RTPProxyRequestHandler
 
 @click.group()
 def cli():
@@ -16,15 +19,14 @@ def cli():
     '''
     ...
 
-
 @cli.group()
 @click.option('--debug', type=bool, help='Enable debug mode.')
 def server(debug):
     '''
     Command that starts the application in SERVER mode.
     '''
-    logger.debug('DEBUG mode enabled.')
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    logger.debug('DEBUG mode enabled.')
     logger.info('Application started in SERVER mode.')
 
 @cli.group()
@@ -36,6 +38,58 @@ def client(debug):
     logger.setLevel(logging.DEBUG if debug else logging.INFO)
     logger.debug('DEBUG mode enabled.')
     logger.info('Application started in CLIENT mode.')
+
+@server.command('rtp', help='Performs the connection test for RTP Proxy machines.')
+@click.option('--host', type=str, required=True, help='Host of the test.')
+@click.option('--port', type=int, required=True, help='Port of the test.')
+def rtp(host, port):
+        address = (host, port)
+        with RTPProxyEmulator(address, RTPProxyRequestHandler) as server:
+                try:
+                        logger.info(f'RTPProxy Emulator listen on {host}:{str(port)}.')
+                        server.serve_forever()
+
+                except KeyboardInterrupt:
+                        logger.warn('RTPProxy Emulator manually closed.')
+
+@client.command('rtp', help='Performs the connection test for RTP Proxy machines.')
+@click.option('--host', type=str, required=True, help='Host of the test.')
+@click.option('--port', type=int, required=True, help='Port of the test.')
+@click.option('--loops', type=int, default=1000, help='Number of packets to be sent..')
+@click.option('--size', type=int, default=1024, help='Size of the packet to be sent (in bytes).')
+def rtp(host, port, size, loops):
+        address = (host, port)
+        logger.info('Performing RTP Proxy test.')
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
+                client.settimeout(5)
+                client.connect(address)
+                
+                status, durations = send_loop(client, size, loops)
+                jitter = max(durations) - min(durations)
+
+                if all(status):
+                        logger.info('Test completed successfully.')
+                        logger.info(f'Package size used: {str(size)} bytes')
+                        logger.info(f'Total of packages sent: {str(loops)}')
+                        logger.info(f'Average of latency: {average(durations)} seconds.')
+                        logger.info(f'Latency peak: {maximum(durations)} seconds.')
+                        logger.info(f'Latency lowest: {minimal(durations)} seconds.')
+                        logger.info('Jitter: {:.5f} seconds.'.format(jitter))
+
+                else:
+                        logger.warning('Test finished with failure.')
+
+@client.command('nat', help='Identifies the type of NAT used on the network.')
+@click.option('--host', type=str, required=True, help='Host of the test.')
+@click.option('--port', type=int, default=3478, help='Port of the test.')
+def nat(host, port):
+        topology, ext_ip, ext_port, int_ip = get_ip_info(
+                include_internal=True, stun_host=host, stun_port=port
+        )
+        logger.info(f'Topology tipe: {topology}')
+        logger.debug(f'Internal interface used: {int_ip}')
+        logger.debug(f'External address: {ext_ip}:{ext_port}')
+
 
 @client.command('alg', help='Performs the ALG test with the host informed.')
 @click.option('--host', type=str, required=True, help='Host of the test.')

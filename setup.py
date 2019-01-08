@@ -36,7 +36,8 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     install_requires=[
         'click',
-        'jinja2'
+        'jinja2',
+        'pynat'
     ],
     extras_require={ 
         'dev': [
