@@ -1,3 +1,9 @@
-# PySIP
+# IPSLA
 
-CLI para realização de testes na area de VoIP.
+VoIP test tool to check VoIP circuits
+
+Install instructions for Debian
+
+Install python, python-pip
+
+`apt-get install python python-pip`
