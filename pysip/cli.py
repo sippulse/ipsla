@@ -5,11 +5,10 @@ from random import random
 from functools import reduce
 
 import click
-from pynat import get_ip_info
 
 from pysip.log import logger
+from pysip.utils import send_loop, average, mos
 from pysip.messages import Message, parse_header
-from pysip.utils import send_loop, average, minimal, maximum
 from pysip.socketserver import RTPProxyEmulator, RTPProxyRequestHandler
 
 @click.group()
@@ -18,6 +17,7 @@ def cli():
     Função que representa a CLI em si.
     '''
     ...
+
 
 @cli.group()
 @click.option('--debug', type=bool, help='Enable debug mode.')
@@ -29,6 +29,7 @@ def server(debug):
     logger.debug('DEBUG mode enabled.')
     logger.info('Application started in SERVER mode.')
 
+
 @cli.group()
 @click.option('--debug', type=bool, help='Enable debug mode.')
 def client(debug):
@@ -39,6 +40,7 @@ def client(debug):
     logger.debug('DEBUG mode enabled.')
     logger.info('Application started in CLIENT mode.')
 
+
 @server.command('rtp', help='Performs the connection test for RTP Proxy machines.')
 @click.option('--host', type=str, required=True, help='Host of the test.')
 @click.option('--port', type=int, required=True, help='Port of the test.')
@@ -46,16 +48,17 @@ def rtp(host, port):
         address = (host, port)
         with RTPProxyEmulator(address, RTPProxyRequestHandler) as server:
                 try:
-                        logger.info(f'RTPProxy Emulator listen on {host}:{str(port)}.')
+                        logger.info('RTPProxy Emulator listen on {}:{}.'.format(host, port))
                         server.serve_forever()
 
                 except KeyboardInterrupt:
                         logger.warn('RTPProxy Emulator manually closed.')
 
+
 @client.command('rtp', help='Performs the connection test for RTP Proxy machines.')
 @click.option('--host', type=str, required=True, help='Host of the test.')
 @click.option('--port', type=int, required=True, help='Port of the test.')
-@click.option('--loops', type=int, default=1000, help='Number of packets to be sent..')
+@click.option('--loops', type=int, default=1000, help='Number of packets to be sent.')
 @click.option('--size', type=int, default=1024, help='Size of the packet to be sent (in bytes).')
 def rtp(host, port, size, loops):
         address = (host, port)
@@ -69,26 +72,16 @@ def rtp(host, port, size, loops):
 
                 if all(status):
                         logger.info('Test completed successfully.')
-                        logger.info(f'Package size used: {str(size)} bytes')
-                        logger.info(f'Total of packages sent: {str(loops)}')
-                        logger.info(f'Average of latency: {average(durations)} seconds.')
-                        logger.info(f'Latency peak: {maximum(durations)} seconds.')
-                        logger.info(f'Latency lowest: {minimal(durations)} seconds.')
-                        logger.info('Jitter: {:.5f} seconds.'.format(jitter))
+                        logger.info('Package size used: {:d} bytes'.format(size))
+                        logger.info('Total of packages sent: {:d}'.format(loops))
+                        logger.info('Average of latency: {:.2f} seconds.'.format(average(durations)))
+                        logger.info('Latency peak: {:.2f} seconds.'.format(max(durations)))
+                        logger.info('Latency lowest: {:.2f} seconds.'.format(min(durations)))
+                        logger.info('Jitter: {:.2f} seconds.'.format(jitter))
+                        logger.info('MOS: {:.2f}'.format(mos(status)))
 
                 else:
                         logger.warning('Test finished with failure.')
-
-@client.command('nat', help='Identifies the type of NAT used on the network.')
-@click.option('--host', type=str, required=True, help='Host of the test.')
-@click.option('--port', type=int, default=3478, help='Port of the test.')
-def nat(host, port):
-        topology, ext_ip, ext_port, int_ip = get_ip_info(
-                include_internal=True, stun_host=host, stun_port=port
-        )
-        logger.info(f'Topology tipe: {topology}')
-        logger.debug(f'Internal interface used: {int_ip}')
-        logger.debug(f'External address: {ext_ip}:{ext_port}')
 
 
 @client.command('alg', help='Performs the ALG test with the host informed.')
@@ -101,37 +94,33 @@ def aug(host, port, username, domain):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as interface:
         interface.settimeout(5)
         destiny_address = (host, port)
-        logger.info(f'Destiny IP: {host}')
-        logger.info(f'Destiny Port: {port}')
+        logger.info('Destiny IP: {}'.format(host))
+        logger.info('Destiny Port: {}'.formta(port))
         interface.connect(destiny_address) 
         in_host, in_port = interface.getsockname()
-        logger.info(f'Internal IP used: {in_host}')
-        logger.info(f'Internal selected port: {in_port}')
+        logger.info('Internal IP used: {}'.format(in_host))
+        logger.info('Internal selected port: {}'.format(in_port))
         callid = Message.make_hash(str(time() * random()))
         to_tag = Message.make_hash(str(time() * random()))
         branch = Message.make_hash(str(time() * random()))
-        logger.debug(f'Call-ID generated for the package: {callid}')
-        logger.debug(f'To-Tag generated for the package: {to_tag}')
-        logger.debug(f'Branch-Tag generated for the package: {branch}')
+        logger.debug('Call-ID generated for the package: {}'.format(callid))
+        logger.debug('To-Tag generated for the package: {}'.format(to_tag))
+        logger.debug('Branch-Tag generated for the package: {}'.format(branch))
         logger.debug('Generating INVITE that will be forwarded to the Host.')
-        message = Message('invite', **{
-                'address': {'ip': in_host, 'port': in_port },
-                'branch': branch,
-                'from': {
-                        'user': username,
-                        'domain': domain,
-                        'tag':  to_tag
-                },
-                'callid': callid
-        })
+        message = Message('invite',
+                          callid=callid,
+                          branch=branch,
+                          address={'ip': in_host, 'port': in_port },
+                          sip_from={'user': username, 'domain': domain, 'tag':  to_tag})
+
         try:
                 interface.send(message.render)
                 response = interface.recv(4096).decode('ASCII')
                 resp_list = [v for v in response.split('\r\n') if v]
                 result = dict(parse_header(value) for value in resp_list)
-                logger.info(f'Response title: {result["title"]}')
-                logger.debug(f'Call-ID response: {result["Call-ID"]}')
-                logger.debug(f'Response source server: {result["Server"]}')
+                logger.info('Response title: {}'.format(result["title"]))
+                logger.debug('Call-ID response: {}'.format(result["Call-ID"]))
+                logger.debug('Response source server: {}'.format(result["Server"]))
                 _, title = result["title"].split('200')
 
                 if title.strip() == 'OK':

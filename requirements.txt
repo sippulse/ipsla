@@ -1,3 +1,2 @@
 click
 jinja2
-pynat

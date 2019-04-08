@@ -48,9 +48,5 @@ setup(
         'console_scripts': [
             'pysipctl=pysip:cli',
         ],
-    },
-    #project_urls={
-    #    'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
-    #    'Source': 'https://github.com/pypa/sampleproject/',
-    #},
+    }
 )

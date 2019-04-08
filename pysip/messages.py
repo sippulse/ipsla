@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 here = path.abspath(path.dirname(__file__))
 
+
 class Message:
     def __init__(self, name, **kwargs):
         self.loader = FileSystemLoader(path.join(here, 'templates'))
@@ -34,6 +35,7 @@ class Message:
     @render.setter
     def render(self):
         raise AttributeError('This message is not editable.')
+
 
 def parse_header(text):
     length = len(text.split(':')) - 1
