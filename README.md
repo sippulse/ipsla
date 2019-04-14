@@ -36,8 +36,8 @@ python3.7 get-pip.py
 ```bash
 cd ~
 mkdir pysip
-cd pysip
 git clone https://gitlab.sippulse.com/vitor/pysip.git
+cd pysip
 ```
 
 ```bash
