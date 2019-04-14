@@ -32,6 +32,14 @@ python3.7 get-pip.py
 ```
 
 ## How to install and use CLI
+
+```bash
+cd ~
+mkdir pysip
+cd pysip
+git clone https://gitlab.sippulse.com/vitor/pysip.git
+```
+
 ```bash
 python3.7 -m pip install -r requirements.txt
 python3.7 setup.py install
