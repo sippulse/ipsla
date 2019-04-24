@@ -8,12 +8,12 @@ from pysip.log import logger
 class RTPProxyEmulator(ThreadingUDPServer):
     def run(self):
         host, port = self.server_address
-        logger.info(f'RTPProxy Emulator listen on {host}:{str(port)}.')
+        logger.info(f'RTP Emulator listen on {host}:{str(port)}.')
         try:
             self.serve_forever()
 
         except KeyboardInterrupt:
-            logger.warn('RTPProxy Emulator manually closed.')
+            logger.warn('RTP Emulator manually closed.')
 
 
 class RTPProxyRequestHandler(DatagramRequestHandler):

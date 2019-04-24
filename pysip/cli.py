@@ -41,28 +41,28 @@ def client(debug):
     logger.info('Application started in CLIENT mode.')
 
 
-@server.command('rtp', help='Performs the connection test for RTP Proxy machines.')
+@server.command('rtp', help='Performs the connection test for RTP performance.')
 @click.option('--host', type=str, required=True, help='Host of the test.')
 @click.option('--port', type=int, required=True, help='Port of the test.')
 def rtp(host, port):
         address = (host, port)
         with RTPProxyEmulator(address, RTPProxyRequestHandler) as server:
                 try:
-                        logger.info('RTPProxy Emulator listen on {}:{}.'.format(host, port))
+                        logger.info('RTP emulator listen on {}:{}.'.format(host, port))
                         server.serve_forever()
 
                 except KeyboardInterrupt:
-                        logger.warn('RTPProxy Emulator manually closed.')
+                        logger.warn('RTP Emulator manually closed.')
 
 
-@client.command('rtp', help='Performs the connection test for RTP Proxy machines.')
+@client.command('rtp', help='Performs the connection test for RTP machines.')
 @click.option('--host', type=str, required=True, help='Host of the test.')
 @click.option('--port', type=int, required=True, help='Port of the test.')
 @click.option('--loops', type=int, default=1000, help='Number of packets to be sent.')
 @click.option('--size', type=int, default=1024, help='Size of the packet to be sent (in bytes).')
 def rtp(host, port, size, loops):
         address = (host, port)
-        logger.info('Performing RTP Proxy test.')
+        logger.info('Performing RTP test.')
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as client:
                 client.settimeout(5)
                 client.connect(address)
@@ -95,7 +95,7 @@ def aug(host, port, username, domain):
         interface.settimeout(5)
         destiny_address = (host, port)
         logger.info('Destiny IP: {}'.format(host))
-        logger.info('Destiny Port: {}'.formta(port))
+        logger.info('Destiny Port: {}'.format(port))
         interface.connect(destiny_address) 
         in_host, in_port = interface.getsockname()
         logger.info('Internal IP used: {}'.format(in_host))

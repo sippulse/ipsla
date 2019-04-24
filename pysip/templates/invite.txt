@@ -1,7 +1,7 @@
 INVITE sip:{{ sip_from['user'] }}@{{ address['ip'] }}:{{ address['port'] }} SIP/2.0
 Via: SIP/2.0/UDP {{ address['ip'] }}:{{ address['port'] }};rport;branch={{ branch }}
 Max-Forwards: 100
-sip_from: <sip:{{ sip_from['user'] }}@{{ address['ip'] }}>;tag={{ sip_from['tag'] }}
+From: <sip:{{ sip_from['user'] }}@{{ address['ip'] }}>;tag={{ sip_from['tag'] }}
 To: <sip:{{ sip_from['user'] }}@{{ sip_from['domain'] }}>
 Call-ID: {{ callid }}
 Alg-test: 0
