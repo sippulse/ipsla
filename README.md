@@ -30,8 +30,16 @@ Use the first and the last port of your RTP range
 To run an ALG test, you need to have an OpenSIPS Server set with the ALG detector installed
 
 ```bash
-pysipctl CLIENT alg --host <server_host> --port <server_port> 
+pysipctl CLIENT alg --host <server_host> --port <server_port> --test <test_number>
 ```
+
+where <test_number> is the type of test 
+
+1 - Test Contact if original
+2 - Test Via if original
+4 - Test SDP if original
+
+The test is of match type "ANY" the default is 7 (All tests)
 
 The responses will be ALG detected, No ALG detected
 
