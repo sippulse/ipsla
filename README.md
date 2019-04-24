@@ -21,8 +21,12 @@ pysipctl CLIENT rtp --host <server_host> --port <server_port> --loops <number_of
 
 Where:
 
-<server_host> is the server host to be tested
-<server_port> is the server port to be tested
+<server_host> is the server host to be tested\
+<server_port> is the server port to be tested\
 <number_of_loops> is the number of loops to be tested
+
+Use the first and the last port of your RTP range
+
+
 
 
