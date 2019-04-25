@@ -1,0 +1,2 @@
+ - Create Windows .exe using pyinstaller
+ - Add the code to log the results in the elasticsearch

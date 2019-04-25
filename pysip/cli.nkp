@@ -15,7 +15,7 @@ from pysip.socketserver import RTPProxyEmulator, RTPProxyRequestHandler
 @click.group()
 def cli():
     '''
-    VoIP test tool.
+    Função que representa a CLI em si.
     '''
     ...
 
