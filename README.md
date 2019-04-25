@@ -1,9 +1,9 @@
-#IPSLA
+# IPSLA
 
 The objective of the IPSLA project is to test circuits to detect ALG routers and to to test the rtp performance of the circuit.
 
 
-#HOW TO USE
+# HOW TO USE
 
 The system has two modes, SERVER and CLIENT, the SERVER should be running in the first and the last rtp address of the rtp range. For ALG tests, your server needs to run OPENSIPS with a simple script for ALG detection. 
 
