@@ -4,13 +4,14 @@ Max-Forwards: 100
 From: <sip:{{ sip_from['user'] }}@{{ address['ip'] }}>;tag={{ sip_from['tag'] }}
 To: <sip:{{ sip_from['user'] }}@{{ sip_from['domain'] }}>
 Call-ID: {{ callid }}
-Alg-test: 0
 CSeq: 1 INVITE
 Contact: <sip:{{ sip_from['user'] }}@{{ address['ip'] }}:{{ address['port'] }}>
 User-Agent: PySIP
 Allow: INVITE, ACK, BYE, CANCEL, OPTIONS, MESSAGE, INFO, UPDATE, REGISTER, REFER, NOTIFY, PUBLISH, SUBSCRIBE
 Supported: path, replaces
 Allow-Events: talk, hold, conference, presence, as-feature-event, dialog, line-seize, call-info, sla, include-session-description, presence.winfo, message-summary, refer
+X-ALG-TEST: {{ test }}
+X-ALG-PREIP: {{ iphash['hash'] }}
 Content-Type: application/sdp
 Content-Disposition: session
 Content-Length: 281

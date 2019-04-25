@@ -1,5 +1,6 @@
 import socket
 import logging
+import hashlib
 from time import time
 from random import random
 from functools import reduce
@@ -86,10 +87,9 @@ def rtp(host, port, size, loops):
 
 @client.command('alg', help='Performs the ALG test with the host informed.')
 @click.option('--host', type=str, required=True, help='Host of the test.')
-@click.option('--username', type=str, required=True, help='Username of the test.')
-@click.option('--domain', type=str, required=True, help='Domain of the test.')
 @click.option('--port', type=int, default=5060, help='Port of the test.')
-def aug(host, port, username, domain):
+@click.option('--test', type=int, default=7, help='Type of tests.')
+def aug(host, port,test):
     logger.info('Performing ALG test.')
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as interface:
         interface.settimeout(5)
@@ -98,6 +98,7 @@ def aug(host, port, username, domain):
         logger.info('Destiny Port: {}'.format(port))
         interface.connect(destiny_address) 
         in_host, in_port = interface.getsockname()
+        ip_hash = hashlib.md5(in_host.encode())
         logger.info('Internal IP used: {}'.format(in_host))
         logger.info('Internal selected port: {}'.format(in_port))
         callid = Message.make_hash(str(time() * random()))
@@ -110,8 +111,10 @@ def aug(host, port, username, domain):
         message = Message('invite',
                           callid=callid,
                           branch=branch,
+                          test=test,
                           address={'ip': in_host, 'port': in_port },
-                          sip_from={'user': username, 'domain': domain, 'tag':  to_tag})
+                          iphash={ 'hash': ip_hash.hexdigest() }, 
+                          sip_from={'user': "algtest", 'domain': in_host, 'tag':  to_tag})
 
         try:
                 interface.send(message.render)
@@ -124,7 +127,7 @@ def aug(host, port, username, domain):
                 _, title = result["title"].split('200')
 
                 if title.strip() == 'OK':
-                        logger.info('ALG test completed successfully.')
+                        logger.info('No ALG detected')
 
                 else:
                         logger.warn('Router with ALG detected.')
