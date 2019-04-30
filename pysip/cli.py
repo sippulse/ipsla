@@ -69,7 +69,7 @@ def rtp(host, port, size, loops):
                 client.connect(address)
                 
                 status, durations = send_loop(client, size, loops)
-                jitter = max(durations) - min(durations)
+                jitter = (max(durations) - min(durations))/2
 
                 if all(status):
                         logger.info('Test completed successfully.')
