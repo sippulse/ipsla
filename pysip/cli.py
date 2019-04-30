@@ -8,7 +8,7 @@ from functools import reduce
 import click
 
 from pysip.log import logger
-from pysip.utils import send_loop, average, mos
+from pysip.utils import send_loop, average, mos, percentage
 from pysip.messages import Message, parse_header
 from pysip.socketserver import RTPProxyEmulator, RTPProxyRequestHandler
 
@@ -79,8 +79,8 @@ def rtp(host, port, size, loops):
                         logger.info('Latency peak: {:.2f} seconds.'.format(max(durations)))
                         logger.info('Latency lowest: {:.2f} seconds.'.format(min(durations)))
                         logger.info('Jitter: {:.2f} seconds.'.format(jitter))
+                        logger.info('Packet Loss {:.2f}'.format(percentage(status,False)))
                         logger.info('MOS: {:.2f}'.format(mos(status)))
-
                 else:
                         logger.warning('Test finished with failure.')
 
