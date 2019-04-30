@@ -78,7 +78,7 @@ def rtp(host, port, size, loops):
                         logger.info('Average of latency: {:.2f} miliseconds.'.format(average(durations)/2*1000))
                         logger.info('Latency peak: {:.2f} miliseconds.'.format(max(durations)/2*1000))
                         logger.info('Latency lowest: {:.2f} miliseconds.'.format(min(durations)/2*1000))
-                        logger.info('Jitter: {:.2f} seconds.'.format(jitter))
+                        logger.info('Jitter: {:.2f} miliseconds.'.format(jitter*1000))
                         logger.info('Packet Loss {:.2f}'.format(percentage(status,False)))
                         logger.info('MOS: {:.2f}'.format(mos(status)))
                 else:
