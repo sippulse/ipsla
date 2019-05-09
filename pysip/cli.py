@@ -124,8 +124,11 @@ def aug(host, port,test):
                 logger.info('Response title: {}'.format(result["title"]))
                 logger.debug('Call-ID response: {}'.format(result["Call-ID"]))
                 logger.debug('Response source server: {}'.format(result["Server"]))
-                _, title = result["title"].split('200')
-
+                if '200' in result["title"]:
+                    _, title = result["title"].split('200')
+                else:
+                    title = "NOK"
+                    
                 if title.strip() == 'OK':
                         logger.info('No ALG detected')
 
