@@ -43,7 +43,7 @@ def  send_loop(socket, size, loop):
             status.append(data.upper() == response)
             durations.append(end - start)
         
-        except ConnectionRefusedError:
+        except (ConnectionRefusedError, OSError):
             status.append(False)
             durations.append(5)
 
